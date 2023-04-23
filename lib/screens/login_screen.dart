@@ -1,37 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mynotes/screens/login_screen.dart';
-import 'firebase_options.dart';
+import 'package:mynotes/firebase_options.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const LoginScreen(),
-    );
-  }
-}
-
-class RegisterationScreen extends StatefulWidget {
-  const RegisterationScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<RegisterationScreen> createState() => _RegisterationScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _RegisterationScreenState extends State<RegisterationScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   late final TextEditingController _email;
   late final TextEditingController _password;
 
@@ -53,7 +32,7 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Register"),
+        title: const Text("Login"),
       ),
       body: FutureBuilder(
         future: Firebase.initializeApp(
@@ -85,13 +64,13 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
                       final email = _email.text;
                       final password = _password.text;
                       final userCredential = await FirebaseAuth.instance
-                          .createUserWithEmailAndPassword(
+                          .signInWithEmailAndPassword(
                         email: email,
                         password: password,
                       );
                       print(userCredential);
                     },
-                    child: const Text("Register"),
+                    child: const Text("Login"),
                   ),
                 ],
               );
