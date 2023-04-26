@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mynotes/firebase_options.dart';
+import 'package:mynotes/screens/login_screen.dart';
 
 class RegisterationScreen extends StatefulWidget {
   const RegisterationScreen({super.key});
@@ -33,6 +34,7 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Register"),
+        centerTitle: true,
       ),
       body: FutureBuilder(
         future: Firebase.initializeApp(
@@ -44,20 +46,23 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
               return Column(
                 children: [
                   TextField(
-                      controller: _email,
-                      enableSuggestions: false,
-                      autocorrect: false,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                          hintText: "Enter your email here")),
+                    controller: _email,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                        hintText: "Enter your email here"),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   TextField(
                     controller: _password,
                     obscureText: true,
                     enableSuggestions: false,
                     autocorrect: false,
                     decoration: const InputDecoration(
-                      hintText: "Enter your password here",
-                    ),
+                        hintText: "Enter your password here"),
                   ),
                   TextButton(
                     onPressed: () async {
@@ -143,6 +148,27 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
                     },
                     child: const Text("Register"),
                   ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Already have an account? "),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginScreen()));
+                        },
+                        child: const Text(
+                          "Login",
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               );
             default:
