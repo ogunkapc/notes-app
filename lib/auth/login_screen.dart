@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mynotes/firebase_options.dart';
-import 'package:mynotes/screens/register_screen.dart';
+import 'package:mynotes/auth/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -96,7 +96,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () async {
                         final email = _email.text;
                         final password = _password.text;
-
                         //! Handle Exception
                         try {
                           final userCredential = await FirebaseAuth.instance
@@ -110,6 +109,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             print("User not found");
                           } else if (e.code == "wrong-password") {
                             print("Wrong password");
+                          } else if (e.code == "network-request-failed") {
+                            print(
+                                "Network error, check your internet connection");
                           }
                         }
                       },

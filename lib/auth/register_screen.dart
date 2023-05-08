@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mynotes/firebase_options.dart';
-import 'package:mynotes/screens/login_screen.dart';
+import 'package:mynotes/auth/login_screen.dart';
 
 class RegisterationScreen extends StatefulWidget {
   const RegisterationScreen({super.key});
@@ -94,6 +94,7 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
                       onPressed: () async {
                         final email = _email.text;
                         final password = _password.text;
+                        //! Handle Exception
                         try {
                           final userCredential = await FirebaseAuth.instance
                               .createUserWithEmailAndPassword(
