@@ -1,6 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:mynotes/auth/login_screen.dart';
+import 'package:mynotes/auth/register_screen.dart';
 import 'package:mynotes/firebase_options.dart';
 
 void main() {
@@ -19,6 +20,12 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const HomePage(),
+      // home: const LoginScreen(),
+      // home: const VerifyEmailView(),
+      routes: {
+        "/login/": (context) => const LoginScreen(),
+        "/register/": (context) => const RegisterationScreen(),
+      },
     );
   }
 }
@@ -28,30 +35,25 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Register"),
-        centerTitle: true,
+    return FutureBuilder(
+      future: Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
       ),
-      body: FutureBuilder(
-        future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        ),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              final user = FirebaseAuth.instance.currentUser;
-              if (user!.emailVerified) {
-                print("You are a verified user");
-              } else {
-                print("You need to verify your email");
-              }
-              return const Text("Done");
-            default:
-              return const Text("Loading...");
-          }
-        },
-      ),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.done:
+            // final user = FirebaseAuth.instance.currentUser;
+            // if (user?.emailVerified ?? false) {
+            //   return const Text("Done");
+            // } else {
+            //   print("Not verified!!!");
+            //   return const VerifyEmailView();
+            // }
+            return const LoginScreen();
+          default:
+            return const CircularProgressIndicator();
+        }
+      },
     );
   }
 }
