@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as devtools show log;
 
 class RegisterationScreen extends StatefulWidget {
   const RegisterationScreen({super.key});
@@ -91,11 +92,10 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
                     email: email,
                     password: password,
                   );
-                  print(userCredential);
+                  devtools.log(userCredential.toString());
                 } on FirebaseAuthException catch (e) {
-                  print(e);
                   if (e.code == "email-already-in-use") {
-                    print("Email already in use");
+                    devtools.log("Email already in use");
                     showDialog(
                       context: context,
                       builder: (context) => Container(
@@ -116,7 +116,7 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
                       ),
                     );
                   } else if (e.code == "weak-password") {
-                    print("Weak password");
+                    ("Weak password");
                     showDialog(
                       context: context,
                       builder: (context) => Container(
@@ -137,7 +137,7 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
                       ),
                     );
                   } else if (e.code == "invalid-email") {
-                    print("Invalid email");
+                    devtools.log("Invalid email");
                     showDialog(
                       context: context,
                       builder: (context) => Container(
