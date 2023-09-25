@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
+import 'package:mynotes/constants/routes.dart';
+
 class RegisterationScreen extends StatefulWidget {
   const RegisterationScreen({super.key});
 
@@ -169,10 +171,10 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text("Already have an account? "),
-                TextButton(
-                  onPressed: () {
+                GestureDetector(
+                  onTap: () {
                     Navigator.of(context).pushNamedAndRemoveUntil(
-                      "/login/",
+                      loginRoute,
                       (route) => false,
                     );
                   },
@@ -187,31 +189,5 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
         ),
       ),
     );
-    // Scaffold(
-    //   appBar: AppBar(
-    //     title: const Text("Register"),
-    //     centerTitle: true,
-    //   ),
-    //   body: FutureBuilder(
-    //     future: Firebase.initializeApp(
-    //       options: DefaultFirebaseOptions.currentPlatform,
-    //     ),
-    //     builder: (context, snapshot) {
-    //       switch (snapshot.connectionState) {
-    //         case ConnectionState.done:
-    //           return
-    //         default:
-    //           return const Center(
-    //             child: Column(
-    //               children: [
-    //                 CircularProgressIndicator(),
-    //                 Text("Loading..."),
-    //               ],
-    //             ),
-    //           );
-    //       }
-    //     },
-    //   ),
-    // );
   }
 }

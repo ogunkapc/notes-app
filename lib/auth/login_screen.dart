@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
+import 'package:mynotes/constants/routes.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -31,14 +33,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Login"),
-          centerTitle: true,
-        ),
-        body: Column(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Login"),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
+        child: Column(
           children: [
             TextField(
               controller: _email,
@@ -89,12 +91,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 final password = _password.text;
                 //! Handle Exception
                 try {
-                  await FirebaseAuth.instance.signInWithEmailAndPassword(
+                  final userCredential =
+                      FirebaseAuth.instance.signInWithEmailAndPassword(
                     email: email,
                     password: password,
                   );
+                  devtools.log(userCredential.toString());
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                    "/notes/",
+                    notesRoute,
                     (route) => false,
                   );
                 } on FirebaseAuthException catch (e) {
@@ -117,10 +121,10 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text("Don't have an account? "),
-                TextButton(
-                  onPressed: () {
+                GestureDetector(
+                  onTap: () {
                     Navigator.of(context).pushNamedAndRemoveUntil(
-                      "/register/",
+                      registerRoute,
                       (route) => false,
                     );
                   },
@@ -135,31 +139,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-    // Scaffold(
-    //   appBar: AppBar(
-    //     title: const Text("Login"),
-    //     centerTitle: true,
-    //   ),
-    //   body: FutureBuilder(
-    //     future: Firebase.initializeApp(
-    //       options: DefaultFirebaseOptions.currentPlatform,
-    //     ),
-    //     builder: (context, snapshot) {
-    //       switch (snapshot.connectionState) {
-    //         case ConnectionState.done:
-    //           return
-    //         default:
-    //           return const Center(
-    //             child: Column(
-    //               children: [
-    //                 CircularProgressIndicator(),
-    //                 Text("Loading..."),
-    //               ],
-    //             ),
-    //           );
-    //       }
-    //     },
-    //   ),
-    // );
   }
 }

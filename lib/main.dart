@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:mynotes/auth/login_screen.dart';
 import 'package:mynotes/auth/register_screen.dart';
 import 'package:mynotes/auth/verify_email.dart';
+import 'package:mynotes/constants/routes.dart';
 import 'package:mynotes/firebase_options.dart';
-import 'dart:developer' as devtools show log;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,9 +26,9 @@ class MyApp extends StatelessWidget {
       // home: const LoginScreen(),
       // home: const VerifyEmailView(),
       routes: {
-        "/login/": (context) => const LoginScreen(),
-        "/register/": (context) => const RegisterationScreen(),
-        "/notes/": (context) => const NotesView()
+        loginRoute: (context) => const LoginScreen(),
+        registerRoute: (context) => const RegisterationScreen(),
+        notesRoute: (context) => const NotesView()
       },
     );
   }
@@ -88,8 +88,8 @@ class _NotesViewState extends State<NotesView> {
                   if (shouldLogout) {
                     await FirebaseAuth.instance.signOut();
                     Navigator.of(context).pushNamedAndRemoveUntil(
-                      "/login/",
-                      (route) => false,
+                      loginRoute,
+                      (_) => false,
                     );
                   }
                   break;
@@ -102,7 +102,7 @@ class _NotesViewState extends State<NotesView> {
                   value: MenuAction.logout,
                   child: const Text("Log Out"),
                   onTap: () {
-                    devtools.log(value.toString());
+                    // devtools.log(value.toString());
                   },
                 )
               ];
