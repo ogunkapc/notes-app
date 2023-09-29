@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as devtools show log;
 
 import 'package:mynotes/constants/routes.dart';
+import 'package:mynotes/util/show_error_dialog.dart';
 
 class RegisterationScreen extends StatefulWidget {
   const RegisterationScreen({super.key});
@@ -89,77 +89,42 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
                 final password = _password.text;
                 //! Handle Exception
                 try {
-                  final userCredential = await FirebaseAuth.instance
-                      .createUserWithEmailAndPassword(
+                  await FirebaseAuth.instance.createUserWithEmailAndPassword(
                     email: email,
                     password: password,
                   );
-                  devtools.log(userCredential.toString());
+                  final user = FirebaseAuth.instance.currentUser;
+                  await user?.sendEmailVerification();
+                  Navigator.of(context).pushNamed(verifyEmailRoute);
                 } on FirebaseAuthException catch (e) {
                   if (e.code == "email-already-in-use") {
-                    devtools.log("Email already in use");
-                    showDialog(
-                      context: context,
-                      builder: (context) => Container(
-                        padding: const EdgeInsets.all(20),
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 70, vertical: 300),
-                        color: Colors.white,
-                        child: const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Email already in use",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w600),
-                            ),
-                          ],
-                        ),
-                      ),
+                    await showErrorDialog(
+                      context,
+                      "Email is already in use",
                     );
                   } else if (e.code == "weak-password") {
-                    ("Weak password");
-                    showDialog(
-                      context: context,
-                      builder: (context) => Container(
-                        padding: const EdgeInsets.all(20),
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 70, vertical: 300),
-                        color: Colors.white,
-                        child: const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Weak password",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w600),
-                            ),
-                          ],
-                        ),
-                      ),
+                    await showErrorDialog(
+                      context,
+                      "Weak password",
                     );
                   } else if (e.code == "invalid-email") {
-                    devtools.log("Invalid email");
-                    showDialog(
-                      context: context,
-                      builder: (context) => Container(
-                        padding: const EdgeInsets.all(20),
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 70, vertical: 300),
-                        color: Colors.white,
-                        child: const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Invalid email",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w600),
-                            ),
-                          ],
-                        ),
-                      ),
+                    await showErrorDialog(
+                      context,
+                      "This is an invalid email address",
+                    );
+                  } else {
+                    await showErrorDialog(
+                      context,
+                      "Error ${e.code}",
                     );
                   }
+                }
+                // Handle other exceptions
+                catch (e) {
+                  await showErrorDialog(
+                    context,
+                    e.toString(),
+                  );
                 }
               },
               child: const Text("Register"),

@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as devtools show log;
 
 import 'package:mynotes/constants/routes.dart';
+import 'package:mynotes/util/show_error_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -91,25 +91,56 @@ class _LoginScreenState extends State<LoginScreen> {
                 final password = _password.text;
                 //! Handle Exception
                 try {
-                  final userCredential =
-                      FirebaseAuth.instance.signInWithEmailAndPassword(
+                  await FirebaseAuth.instance.signInWithEmailAndPassword(
                     email: email,
                     password: password,
                   );
-                  devtools.log(userCredential.toString());
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    notesRoute,
-                    (route) => false,
-                  );
-                } on FirebaseAuthException catch (e) {
-                  if (e.code == "user-not-found") {
-                    devtools.log("User not found");
-                  } else if (e.code == "wrong-password") {
-                    devtools.log("Wrong password");
-                  } else if (e.code == "network-request-failed") {
-                    devtools
-                        .log("Network error, check your internet connection");
+                  // get current user
+                  final user = FirebaseAuth.instance.currentUser;
+                  if (user?.emailVerified ?? false) {
+                    // user's email is verified
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      notesRoute,
+                      (route) => false,
+                    );
+                  } else {
+                    // user's email is NOT verified
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      verifyEmailRoute,
+                      (route) => false,
+                    );
                   }
+                }
+                // Handle FirebaseAuth exceptions
+                on FirebaseAuthException catch (e) {
+                  if (e.code == "user-not-found") {
+                    await showErrorDialog(
+                      context,
+                      "User not found",
+                    );
+                  } else if (e.code == "wrong-password") {
+                    await showErrorDialog(
+                      context,
+                      "Wrong credentials",
+                    );
+                  } else if (e.code == "network-request-failed") {
+                    await showErrorDialog(
+                      context,
+                      "Network error, check your internet connection",
+                    );
+                  } else {
+                    await showErrorDialog(
+                      context,
+                      "Error ${e.code}",
+                    );
+                  }
+                }
+                // Handle other exceptions
+                catch (e) {
+                  await showErrorDialog(
+                    context,
+                    e.toString(),
+                  );
                 }
               },
               child: const Text("Login"),
