@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:mynotes/constants/routes.dart';
 import 'package:mynotes/util/show_error_dialog.dart';
 
-class RegisterationScreen extends StatefulWidget {
-  const RegisterationScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<RegisterationScreen> createState() => _RegisterationScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _RegisterationScreenState extends State<RegisterationScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   late final TextEditingController _email;
   late final TextEditingController _password;
   bool isSelectionOn = true;
@@ -35,7 +35,7 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Register"),
+        title: const Text("Login"),
         centerTitle: true,
       ),
       body: Padding(
@@ -72,11 +72,13 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 suffixIcon: GestureDetector(
-                  onTap: () => setState(
-                    () {
-                      isSelectionOn = !isSelectionOn;
-                    },
-                  ),
+                  onTap: () {
+                    setState(
+                      () {
+                        isSelectionOn = !isSelectionOn;
+                      },
+                    );
+                  },
                   child: Icon(isSelectionOn
                       ? CupertinoIcons.eye_slash_fill
                       : CupertinoIcons.eye_fill),
@@ -89,28 +91,42 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
                 final password = _password.text;
                 //! Handle Exception
                 try {
-                  await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                  await FirebaseAuth.instance.signInWithEmailAndPassword(
                     email: email,
                     password: password,
                   );
+                  // get current user
                   final user = FirebaseAuth.instance.currentUser;
-                  await user?.sendEmailVerification();
-                  Navigator.of(context).pushNamed(verifyEmailRoute);
-                } on FirebaseAuthException catch (e) {
-                  if (e.code == "email-already-in-use") {
-                    await showErrorDialog(
-                      context,
-                      "Email is already in use",
+                  if (user?.emailVerified ?? false) {
+                    // user's email is verified
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      notesRoute,
+                      (route) => false,
                     );
-                  } else if (e.code == "weak-password") {
-                    await showErrorDialog(
-                      context,
-                      "Weak password",
+                  } else {
+                    // user's email is NOT verified
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      verifyEmailRoute,
+                      (route) => false,
                     );
-                  } else if (e.code == "invalid-email") {
+                  }
+                }
+                //! Handle FirebaseAuth exceptions
+                on FirebaseAuthException catch (e) {
+                  if (e.code == "user-not-found") {
                     await showErrorDialog(
                       context,
-                      "This is an invalid email address",
+                      "User not found",
+                    );
+                  } else if (e.code == "wrong-password") {
+                    await showErrorDialog(
+                      context,
+                      "Wrong credentials",
+                    );
+                  } else if (e.code == "network-request-failed") {
+                    await showErrorDialog(
+                      context,
+                      "Network error, check your internet connection",
                     );
                   } else {
                     await showErrorDialog(
@@ -119,7 +135,7 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
                     );
                   }
                 }
-                // Handle other exceptions
+                //! Handle other exceptions
                 catch (e) {
                   await showErrorDialog(
                     context,
@@ -127,7 +143,7 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
                   );
                 }
               },
-              child: const Text("Register"),
+              child: const Text("Login"),
             ),
             const SizedBox(
               height: 10,
@@ -135,16 +151,16 @@ class _RegisterationScreenState extends State<RegisterationScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("Already have an account? "),
+                const Text("Don't have an account? "),
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).pushNamedAndRemoveUntil(
-                      loginRoute,
+                      registerRoute,
                       (route) => false,
                     );
                   },
                   child: const Text(
-                    "Login",
+                    "Register",
                     style: TextStyle(color: Colors.blue),
                   ),
                 ),

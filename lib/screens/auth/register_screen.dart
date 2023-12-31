@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:mynotes/constants/routes.dart';
 import 'package:mynotes/util/show_error_dialog.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterationScreen extends StatefulWidget {
+  const RegisterationScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterationScreen> createState() => _RegisterationScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterationScreenState extends State<RegisterationScreen> {
   late final TextEditingController _email;
   late final TextEditingController _password;
   bool isSelectionOn = true;
@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login"),
+        title: const Text("Register"),
         centerTitle: true,
       ),
       body: Padding(
@@ -72,13 +72,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 suffixIcon: GestureDetector(
-                  onTap: () {
-                    setState(
-                      () {
-                        isSelectionOn = !isSelectionOn;
-                      },
-                    );
-                  },
+                  onTap: () => setState(() {
+                    isSelectionOn = !isSelectionOn;
+                  }),
                   child: Icon(isSelectionOn
                       ? CupertinoIcons.eye_slash_fill
                       : CupertinoIcons.eye_fill),
@@ -91,42 +87,32 @@ class _LoginScreenState extends State<LoginScreen> {
                 final password = _password.text;
                 //! Handle Exception
                 try {
-                  await FirebaseAuth.instance.signInWithEmailAndPassword(
+                  await FirebaseAuth.instance.createUserWithEmailAndPassword(
                     email: email,
                     password: password,
                   );
                   // get current user
                   final user = FirebaseAuth.instance.currentUser;
-                  if (user?.emailVerified ?? false) {
-                    // user's email is verified
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      notesRoute,
-                      (route) => false,
-                    );
-                  } else {
-                    // user's email is NOT verified
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      verifyEmailRoute,
-                      (route) => false,
-                    );
-                  }
+                  // send email verification
+                  await user?.sendEmailVerification();
+                  Navigator.of(context).pushNamed(verifyEmailRoute);
                 }
-                // Handle FirebaseAuth exceptions
+                //! Handle FirebaseAuth exceptions
                 on FirebaseAuthException catch (e) {
-                  if (e.code == "user-not-found") {
+                  if (e.code == "email-already-in-use") {
                     await showErrorDialog(
                       context,
-                      "User not found",
+                      "Email is already in use",
                     );
-                  } else if (e.code == "wrong-password") {
+                  } else if (e.code == "weak-password") {
                     await showErrorDialog(
                       context,
-                      "Wrong credentials",
+                      "Weak password",
                     );
-                  } else if (e.code == "network-request-failed") {
+                  } else if (e.code == "invalid-email") {
                     await showErrorDialog(
                       context,
-                      "Network error, check your internet connection",
+                      "This is an invalid email address",
                     );
                   } else {
                     await showErrorDialog(
@@ -135,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     );
                   }
                 }
-                // Handle other exceptions
+                //! Handle other exceptions
                 catch (e) {
                   await showErrorDialog(
                     context,
@@ -143,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                 }
               },
-              child: const Text("Login"),
+              child: const Text("Register"),
             ),
             const SizedBox(
               height: 10,
@@ -151,16 +137,16 @@ class _LoginScreenState extends State<LoginScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("Don't have an account? "),
+                const Text("Already have an account? "),
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).pushNamedAndRemoveUntil(
-                      registerRoute,
+                      loginRoute,
                       (route) => false,
                     );
                   },
                   child: const Text(
-                    "Register",
+                    "Login",
                     style: TextStyle(color: Colors.blue),
                   ),
                 ),

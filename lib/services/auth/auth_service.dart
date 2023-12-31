@@ -1,6 +1,7 @@
 import 'package:mynotes/services/auth/auth_provider.dart';
 import 'package:mynotes/services/auth/auth_user.dart';
 
+//AuthService exposes all functionalities of the AuthProvider
 class AuthService implements AuthProvider {
   final AuthProvider provider;
 
@@ -11,7 +12,10 @@ class AuthService implements AuthProvider {
     required String email,
     required String password,
   }) =>
-      provider.createUser(email: email, password: password);
+      provider.createUser(
+        email: email,
+        password: password,
+      );
 
   @override
   AuthUser? get currentUser => provider.currentUser;

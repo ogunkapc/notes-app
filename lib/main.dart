@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:mynotes/auth/login_screen.dart';
-import 'package:mynotes/auth/register_screen.dart';
-import 'package:mynotes/auth/verify_email.dart';
+import 'package:mynotes/screens/auth/login_screen.dart';
+import 'package:mynotes/screens/auth/register_screen.dart';
+import 'package:mynotes/screens/auth/verify_email.dart';
 import 'package:mynotes/constants/routes.dart';
 import 'package:mynotes/firebase_options.dart';
 
@@ -23,8 +23,6 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const HomePage(),
-      // home: const LoginScreen(),
-      // home: const VerifyEmailView(),
       routes: {
         loginRoute: (context) => const LoginScreen(),
         registerRoute: (context) => const RegisterationScreen(),

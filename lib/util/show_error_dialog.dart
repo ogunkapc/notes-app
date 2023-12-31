@@ -1,6 +1,6 @@
-//! Error dialog
 import 'package:flutter/material.dart';
 
+//! Error dialog
 Future<void> showErrorDialog(
   BuildContext context,
   String text,
