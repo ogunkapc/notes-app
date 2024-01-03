@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:mynotes/constants/routes.dart';
+import 'package:mynotes/services/auth/auth_exceptions.dart';
+import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/util/show_error_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -91,13 +91,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 final password = _password.text;
                 //! Handle Exception
                 try {
-                  await FirebaseAuth.instance.signInWithEmailAndPassword(
+                  await AuthService.firebase().logIn(
                     email: email,
                     password: password,
                   );
                   // get current user
-                  final user = FirebaseAuth.instance.currentUser;
-                  if (user?.emailVerified ?? false) {
+                  final user = AuthService.firebase().currentUser;
+                  if (user?.isEmailVerified ?? false) {
                     // user's email is verified
                     Navigator.of(context).pushNamedAndRemoveUntil(
                       notesRoute,
@@ -112,28 +112,26 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
                 }
                 //! Handle FirebaseAuth exceptions
-                on FirebaseAuthException catch (e) {
-                  if (e.code == "user-not-found") {
-                    await showErrorDialog(
-                      context,
-                      "User not found",
-                    );
-                  } else if (e.code == "wrong-password") {
-                    await showErrorDialog(
-                      context,
-                      "Wrong credentials",
-                    );
-                  } else if (e.code == "network-request-failed") {
-                    await showErrorDialog(
-                      context,
-                      "Network error, check your internet connection",
-                    );
-                  } else {
-                    await showErrorDialog(
-                      context,
-                      "Error ${e.code}",
-                    );
-                  }
+                on UserNotFoundAuthException {
+                  await showErrorDialog(
+                    context,
+                    "User not found",
+                  );
+                } on WrongPasswordAuthException {
+                  await showErrorDialog(
+                    context,
+                    "Wrong credentials",
+                  );
+                } on NetworkErrorAuthException {
+                  await showErrorDialog(
+                    context,
+                    "Network error, check your internet connection",
+                  );
+                } on GenericAuthException {
+                  await showErrorDialog(
+                    context,
+                    "Authentication error",
+                  );
                 }
                 //! Handle other exceptions
                 catch (e) {
